@@ -1,0 +1,53 @@
+@import '../variables';
+
+.categories {
+  @media (max-width: 770px) {
+    margin-bottom: 20px;
+  }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ul {
+    display: flex;
+    @media (max-width: 1300px) {
+      flex-wrap: wrap;
+      width: 90%;
+    }
+    @media (max-width: 770px) {
+      width: 500px;
+      justify-content: center;
+    }
+    @media (max-width: 600px) {
+      width: 90%;
+    }
+
+    li {
+      background-color: #f9f9f9;
+      padding: 13px 30px;
+      border-radius: 30px;
+      margin-right: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.1s ease-in-out;
+
+      @media (max-width: 1300px) {
+        margin-bottom: 5px;
+      }
+
+      @include noselect();
+
+      &:hover {
+        background-color: darken(#f9f9f9, 2%);
+      }
+
+      &:active {
+        background-color: darken(#f9f9f9, 5%);
+      }
+
+      &.active {
+        background-color: #282828;
+        color: #fff;
+      }
+    }
+  }
+}
