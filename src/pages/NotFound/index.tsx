@@ -1,6 +1,7 @@
 import s from './NotFound.module.css'
+import React from "react";
 
-let NotFound = () => {
+let NotFound: React.FC = () => {
     return (
         <div className="container">
             <div className={s.wrapper}>
