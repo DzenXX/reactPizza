@@ -19,7 +19,8 @@ let Header: React.FC = () => {
     const location = useLocation()
 
     const onCrossClick = () => {
-        setSearchValue('')
+        dispatch(setSearchValue(''))
+        setInputValue('')
         inputRef.current?.focus()
     }
 

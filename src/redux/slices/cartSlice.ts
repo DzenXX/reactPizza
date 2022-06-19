@@ -1,19 +1,20 @@
-import {createSlice} from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import cartItem from "../../components/CartItem";
+import {RootState} from "../store";
 
 
-type CartItem = {
+export type CartItemT = {
     id: string,
     title: string,
     price: number,
     imageUrl: string,
-    size: string,
-    type: string,
+    size: number,
+    type: number,
     count: number,
 }
 
 interface cartSliceState {
-    items: CartItem[],
+    items: CartItemT[],
     totalPrice: number,
     totalCount: number,
 }
@@ -28,7 +29,7 @@ let cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addPizzaItem: (state, action) => {
+        addPizzaItem: (state, action: PayloadAction<CartItemT>) => {
             let findItem = state.items.find((obj) => obj.id === action.payload.id)
             console.log(findItem)
             if (findItem) {
@@ -39,14 +40,14 @@ let cartSlice = createSlice({
                 state.items.push(newItem)
             }
 
-            state.totalPrice = state.items.reduce((sum, obj) => {
+            state.totalPrice = state.items.reduce((sum: number, obj) => {
                 return sum + obj.price * obj.count
             }, 0)
-            state.totalCount = state.items.reduce((sum, obj) => {
+            state.totalCount = state.items.reduce((sum: number, obj) => {
                 return sum + obj.count
             }, 0)
         },
-        reducePizzaItem: (state, action) => {
+        reducePizzaItem: (state, action: PayloadAction<CartItemT>) => {
             let findItem = state.items.find((obj) => obj.id === action.payload.id)
             if (findItem) {
                 findItem.count -= 1
@@ -59,7 +60,7 @@ let cartSlice = createSlice({
                 return sum + obj.count
             }, 0)
         },
-        removePizzaItem: (state, action) => {
+        removePizzaItem: (state, action: PayloadAction<CartItemT>) => {
             state.items = state.items.filter((obj) => obj.id !== action.payload.id)
 
             state.totalPrice = state.items.reduce((sum, obj) => {
@@ -85,8 +86,8 @@ let cartSlice = createSlice({
 
 export const {addPizzaItem, removePizzaItem, clearPizzaItems, reducePizzaItem} = cartSlice.actions
 
-export const selectPizzaById = (id: string) => state => state.cart.items.find((obj: CartItem) => obj.id === id)
+export const selectPizzaById = (id: string) => (state: RootState) => state.cart.items.find((obj: CartItemT) => obj.id === id)
 
-export const selectCart = state => state.cart
+export const selectCart = (state: RootState) => state.cart
 
 export default cartSlice.reducer

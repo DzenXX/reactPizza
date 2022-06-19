@@ -1,86 +1,62 @@
-// import axios from "axios";
-// import {action} from "prompts/lib/util";
-// import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-//
-//
-//
-//
-// export const fetchPizzaItems = createAsyncThunk(
-//     'pizzas/fetchPizzas', async ({ currentPage, activeCategory, sortArr, selectedSort}) => {
-//         const { data } = await axios.get(
-//             `https://627f8941be1ccb0a466137de.mockapi.io/api/reactPizza/items?page=${currentPage}&limit=4&${activeCategory > 0 ? `category=${activeCategory}` : ''}&${sortArr[selectedSort].param}`
-//         );
-//         console.log("loading")
-//         return data
-//     }
-// )
-//
-// let pizzasSlice = createSlice({
-//     name: 'pizzas',
-//     initialState: {
-//         items: [],
-//         status: 'loading'
-//     },
-//     reducers: {
-//         setPizzaItems: (state, action) => {
-//             state.status = action.payload
-//         },
-//     },
-//     extraReducers: {
-//        [fetchPizzaItems.pending]: (state, action) => {
-//            console.log('Идет загрузка')
-//            state.status = 'loading'
-//            state.items = []
-//        },
-//        [fetchPizzaItems.rejected]: (state, action) => {
-//            console.log('Произошла ошибка')
-//            state.status = 'error'
-//        },
-//         [fetchPizzaItems.fulfilled]: (state, action) => {
-//             state.items = action.payload.data
-//             console.log('Загрузка успешно завершнена')
-//         },
-//     }
-// })
-//
-// export const { setPizzaItems } = pizzasSlice.actions
-//
-// export default pizzasSlice.reducer
 import {createAsyncThunk, createSlice} from "@reduxjs/toolkit";
-
 import axios from "axios";
+import {RootState} from "../store";
+import {SortItem} from "../../pages/Home";
 
-export const fetchPizzaItems = createAsyncThunk(
-    'pizzas/fetchPizzas', async ({ currentPage, activeCategory, sortArr, selectedSort}) => {
+
+interface FetchPizzaArgs {
+    currentPage: number,
+    activeCategory: number,
+    sortArr: SortItem[],
+    selectedSort: number;
+}
+
+export const fetchPizzaItems = createAsyncThunk<PizzaItem[], FetchPizzaArgs>(
+    'pizzas/fetchPizzas', async ({ currentPage, activeCategory, sortArr, selectedSort }) => {
         const { data } = await axios.get(
-            `https://627f8941be1ccb0a466137de.mockapi.io/api/reactPizza/items?page=${currentPage}&limit=4&${activeCategory > 0 ? `category=${activeCategory}` : ''}&${sortArr[selectedSort].param}`
+            `https://627f8941be1ccb0a466137de.mockapi.io/api/reactPizza/items?page=${currentPage}&limit=4&${activeCategory > 0 ? `category=${activeCategory}` : ''}&${sortArr[selectedSort] + '.param'}`
         );
         console.log("loading")
-        return data
+        return data as PizzaItem[]
     }
 )
 
+type PizzaItem = {
+    id: string,
+    title: string,
+    price: number,
+    imageUrl: string,
+    sizes: number[],
+    types: number[]
+}
+
+interface pizzaSliceState {
+    status: 'loading' | 'success' | 'error',
+    items: PizzaItem[]
+}
+
+let initialState: pizzaSliceState = {
+    status: 'loading',
+    items: []
+}
 
 let pizzasSlice = createSlice({
     name: 'filters',
-    initialState: {
-        status: 'loading',
-        pizzas: []
-    },
+    initialState,
     reducers: {
 
     },
     extraReducers: {
-       [fetchPizzaItems.pending]: (state, action) => {
+       [fetchPizzaItems.pending.type]: (state) => {
            console.log('Идет загрузка')
            state.status = 'loading'
            state.items = []
        },
-       [fetchPizzaItems.rejected]: (state, action) => {
+       [fetchPizzaItems.rejected.type]: (state) => {
            console.log('Произошла ошибка')
            state.status = 'error'
        },
-        [fetchPizzaItems.fulfilled]: (state, action) => {
+        [fetchPizzaItems.fulfilled.type]: (state, action) => {
             state.items = action.payload
             state.status = 'success'
             console.log('Загрузка успешно завершнена')
@@ -88,8 +64,7 @@ let pizzasSlice = createSlice({
     }
 })
 
-export const selectStatus = (state) => state.pizzas.status
-export const selectItems = (state) => state.pizzas.items
-// export const {  } = filtersSlice.actions
+export const selectStatus = (state: RootState) => state.pizzas.status
+export const selectItems = (state: RootState) => state.pizzas.items
 
 export default pizzasSlice.reducer

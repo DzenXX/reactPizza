@@ -2,13 +2,14 @@ import Categories from "../components/Categories";
 import Sorting from "../components/Sorting";
 import PizzaSkeleton from "../components/PizzaBlock/Skeleton";
 import PizzaBlock from "../components/PizzaBlock";
-import React from "react";
+import React, {useRef} from "react";
 import Pagination from "../components/Pagination/Pagination";
 import {selectFilters, setCurrentPage, setSelectedSort} from "../redux/slices/filtersSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {fetchPizzaItems, selectItems, selectStatus} from "../redux/slices/pizzasSlice";
+import qs from 'qs'
 
-type SortItem = {
+export type SortItem = {
     text: string,
     param: string,
 }
@@ -18,6 +19,9 @@ let Home: React.FC = () => {
     const {selectedSort, activeCategory, currentPage, searchValue} = useSelector(selectFilters)
 
     const dispatch = useDispatch()
+
+    const isSearch = useRef(false)
+    const isMounted = useRef(false)
 
 
     const sortArr: SortItem[] = [
@@ -32,6 +36,16 @@ let Home: React.FC = () => {
 
 
     const [sortingIsOpen, setSortingIsOpen] = React.useState(false)
+
+
+    React.useEffect(() => {
+      if (window.location.search) {
+          const params = qs.parse(window.location.search.substring(1))
+      }
+
+
+
+    }, [])
 
 
 
