@@ -1,7 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {RootState} from "../store";
-
-
+import {SetFiltersPayload} from "./selectors";
 
 let filtersSlice = createSlice({
     name: 'filters',
@@ -14,7 +12,7 @@ let filtersSlice = createSlice({
     reducers: {
         setSearchValue: (state, action: PayloadAction<string>) => {
             console.log(action.payload)
-          state.searchValue = action.payload
+            state.searchValue = action.payload
         },
         setSelectedSort: (state, action: PayloadAction<number>) => {
             state.selectedSort = action.payload
@@ -24,19 +22,15 @@ let filtersSlice = createSlice({
         },
         setCurrentPage: (state, action: PayloadAction<number>) => {
             state.currentPage = action.payload
+        },
+        setFilters: (state, action: PayloadAction<SetFiltersPayload>) => {
+            state.currentPage = action.payload.currentPage
+            state.activeCategory = action.payload.activeCategory
+            state.selectedSort = action.payload.selectedSort
         }
-
     }
 })
 
-export const { setSelectedSort, setActiveCategory, setCurrentPage, setSearchValue } = filtersSlice.actions
-
-export const selectFilters = (state: RootState) => state.filters
-
-export const selectActiveCategory = (state: RootState) => state.filters.activeCategory
-
-export const selectSearchValue = (state: RootState) => state.filters.searchValue
-
-export const selectSelectedSort = (state: RootState) => state.filters.selectedSort
+export const { setSelectedSort, setActiveCategory, setCurrentPage, setSearchValue, setFilters } = filtersSlice.actions
 
 export default filtersSlice.reducer

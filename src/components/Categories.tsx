@@ -1,12 +1,14 @@
 import React from "react";
-import {selectActiveCategory, setActiveCategory} from "../redux/slices/filtersSlice";
-import {useDispatch, useSelector} from "react-redux";
+import useWhyDidYouUpdate from "ahooks/lib/useWhyDidYouUpdate";
 
-let Categories = () => {
+interface CategoriesProps {
+    onChangeCategory: (id: number) => void,
+    activeCategory: number
+}
 
-    const dispatch = useDispatch()
-    const activeCategory = useSelector(selectActiveCategory)
+export const Categories: React.FC<CategoriesProps> = React.memo(({ activeCategory, onChangeCategory }) => {
 
+    useWhyDidYouUpdate('Categories', { onChangeCategory })
 
     let categories = ['Все', 'Мясные', 'Вегетарианская', 'Гриль', 'Острые', 'Закрытые']
 
@@ -14,10 +16,8 @@ let Categories = () => {
     return (
         <div className="categories">
             <ul>
-                { categories.map((text, i) => (<li key={i} onClick={() => dispatch(setActiveCategory(i)) } className={activeCategory === i ? 'active' : ''}>{text}</li>) ) }
+                { categories.map((text, i) => (<li key={i} onClick={() => onChangeCategory(i) } className={activeCategory === i ? 'active' : ''}>{text}</li>) ) }
             </ul>
         </div>
     )
-}
-
-export default Categories
+})

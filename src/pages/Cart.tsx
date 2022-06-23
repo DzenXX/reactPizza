@@ -1,10 +1,9 @@
 import {useDispatch, useSelector} from "react-redux";
-import {addPizzaItem, clearPizzaItems, removePizzaItem, reducePizzaItem} from "../redux/slices/cartSlice";
-import CartItem from "../components/CartItem";
 import {Link} from "react-router-dom";
 import React from "react";
-import {useEffect} from "react";
 import CartEmpty from "./NotFound/CartEmpty";
+import {clearPizzaItems} from "../redux/cart/slice";
+import {CartItem} from "../components";
 
 let Cart: React.FC = () => {
 

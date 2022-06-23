@@ -1,28 +1,14 @@
+import {getCartFromLS} from "../../utils/getCartFromLS";
+import {getTotalPriceFromLS} from "../../utils/getTotalPriceFromLS";
+import {getTotalCountFromLS} from "../../utils/getTotalCountFromLS";
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import cartItem from "../../components/CartItem";
-import {RootState} from "../store";
-
-
-export type CartItemT = {
-    id: string,
-    title: string,
-    price: number,
-    imageUrl: string,
-    size: number,
-    type: number,
-    count: number,
-}
-
-interface cartSliceState {
-    items: CartItemT[],
-    totalPrice: number,
-    totalCount: number,
-}
+import {CartItemT} from "./types";
+import {cartSliceState} from "./types";
 
 let initialState: cartSliceState = {
-    items: [],
-        totalPrice: 0,
-        totalCount: 0,
+    items: getCartFromLS(),
+    totalPrice: getTotalPriceFromLS(),
+    totalCount: getTotalCountFromLS(),
 };
 
 let cartSlice = createSlice({
@@ -31,7 +17,6 @@ let cartSlice = createSlice({
     reducers: {
         addPizzaItem: (state, action: PayloadAction<CartItemT>) => {
             let findItem = state.items.find((obj) => obj.id === action.payload.id)
-            console.log(findItem)
             if (findItem) {
                 findItem.count++
             } else {
@@ -49,7 +34,7 @@ let cartSlice = createSlice({
         },
         reducePizzaItem: (state, action: PayloadAction<CartItemT>) => {
             let findItem = state.items.find((obj) => obj.id === action.payload.id)
-            if (findItem) {
+            if (findItem && findItem.count > 1) {
                 findItem.count -= 1
             }
 
@@ -85,9 +70,5 @@ let cartSlice = createSlice({
 })
 
 export const {addPizzaItem, removePizzaItem, clearPizzaItems, reducePizzaItem} = cartSlice.actions
-
-export const selectPizzaById = (id: string) => (state: RootState) => state.cart.items.find((obj: CartItemT) => obj.id === id)
-
-export const selectCart = (state: RootState) => state.cart
 
 export default cartSlice.reducer

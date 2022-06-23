@@ -1,82 +1,111 @@
-import Categories from "../components/Categories";
-import Sorting from "../components/Sorting";
-import PizzaSkeleton from "../components/PizzaBlock/Skeleton";
-import PizzaBlock from "../components/PizzaBlock";
-import React, {useRef} from "react";
-import Pagination from "../components/Pagination/Pagination";
-import {selectFilters, setCurrentPage, setSelectedSort} from "../redux/slices/filtersSlice";
-import {useDispatch, useSelector} from "react-redux";
-import {fetchPizzaItems, selectItems, selectStatus} from "../redux/slices/pizzasSlice";
+import React, {useRef, useState} from "react";
+import {useSelector} from "react-redux";
 import qs from 'qs'
+import {useNavigate} from "react-router-dom";
+import {useAppDispatch} from "../redux/store";
+import {selectFilters} from "../redux/filters/types";
+import {setActiveCategory, setCurrentPage, setFilters, setSelectedSort} from "../redux/filters/slice";
+import {selectItems, selectStatus} from "../redux/pizzas/selectors";
+import {fetchPizzaItems} from "../redux/pizzas/slice";
+import {Categories, Pagination, PizzaBlock, PizzaSkeleton, Sorting} from "../components";
 
 export type SortItem = {
     text: string,
     param: string,
+    name: string
 }
 
 let Home: React.FC = () => {
+    //
+    // import('../utils/math').then((file => {
+    //     console.log(file.math(2, 3, 4, 5))
+    // }))
 
-    const {selectedSort, activeCategory, currentPage, searchValue} = useSelector(selectFilters)
-
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
+    const navigate = useNavigate()
 
     const isSearch = useRef(false)
     const isMounted = useRef(false)
 
-
     const sortArr: SortItem[] = [
-        {text: 'популярности', param: 'sortBy=rating&order=desc'},
-        {text: 'цене', param: 'sortBy=price&order=asc'},
-        {text: 'алфавиту', param: 'sortBy=title&order=asc'}
+        {text: 'популярности', param: 'rating&order=desc', name: 'rating'},
+        {text: 'цене', param: 'price&order=asc', name:'price'},
+        {text: 'алфавиту', param: 'title&order=asc', name: 'title'}
     ]
 
-
+    const {selectedSort, activeCategory, currentPage, searchValue} = useSelector(selectFilters)
     const pizzas = useSelector(selectItems)
     const status = useSelector(selectStatus)
 
-
     const [sortingIsOpen, setSortingIsOpen] = React.useState(false)
-
+    const [urlVisibility, setUrlVisibility] = useState(false)
 
     React.useEffect(() => {
-      if (window.location.search) {
-          const params = qs.parse(window.location.search.substring(1))
-      }
+        if (window.location.search) {
+            const params = qs.parse(window.location.search.substring(1))
+            console.log(sortArr.findIndex(el => el.name === params.sortBy))
 
-
+            dispatch(setFilters({
+                activeCategory: Number(params.category),
+                currentPage: Number(params.page),
+                selectedSort: sortArr.findIndex(el => el.name === params.sortBy)
+            }))
+        }
 
     }, [])
 
 
 
     React.useEffect(() => {
-        console.log('jghjkjhkv')
-       // @ts-ignore
-        dispatch(fetchPizzaItems({
-            currentPage,
-            activeCategory,
-            sortArr,
-            selectedSort,
-        }))
+        if (urlVisibility) {
+            const queryString = qs.stringify({
+                sortBy: sortArr[selectedSort].name,
+                page: currentPage,
+                category: activeCategory
+            })
+            navigate(`?${queryString}`)
+        }
+        console.log(isMounted.current)
+        isMounted.current = true
+        setUrlVisibility(true)
+    }, [currentPage, selectedSort, activeCategory])
 
-        window.scrollTo(0, 0)
+
+    React.useEffect(() => {
+
+        if (!isSearch.current) {
+            dispatch(fetchPizzaItems({currentPage, activeCategory, selectedSort}))
+            isSearch.current = false
+            window.scrollTo(0, 0)
+        }
+
+
     }, [selectedSort, activeCategory, currentPage, searchValue])
 
+    const getSortArr = React.useCallback(() => {
+        return sortArr
+    }, [])
 
+    const onChangeCategory = React.useCallback((id: number) => {
+        console.log(id)
+        dispatch(setActiveCategory(id))
+    }, [])
 
-    const onSelectSort = (index: number) => {
+    const onSelectSort = React.useCallback((index: number) => {
         dispatch(setSelectedSort(index))
         setSortingIsOpen(false)
-    }
+    }, [])
+
     const onChangeCurrentPage = (val: number) => {
         dispatch(setCurrentPage(val))
     }
 
+
     return <>
         <div className="container">
             <div className="content__top">
-                <Categories/>
-                <Sorting onSelectSort={onSelectSort} sortArr={sortArr} setSortingIsOpen={setSortingIsOpen}
+                <Categories activeCategory={activeCategory} onChangeCategory={onChangeCategory} />
+                <Sorting getSortArr={getSortArr} selectedSort={selectedSort} onSelectSort={onSelectSort} setSortingIsOpen={setSortingIsOpen}
                          sortingIsOpen={sortingIsOpen}/>
             </div>
             <h2 className="content__title">Все пиццы</h2>

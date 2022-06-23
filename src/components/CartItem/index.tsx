@@ -1,13 +1,13 @@
-import {addPizzaItem, removePizzaItem, reducePizzaItem, clearPizzaItems} from "../../redux/slices/cartSlice";
 import {useDispatch} from "react-redux";
 import React from "react";
+import {addPizzaItem, reducePizzaItem, removePizzaItem} from "../../redux/cart/slice";
 
 type CartItemProps = {
     obj: any,
     pizzaTypes: string[]
 }
 
-let CartItem: React.FC<CartItemProps> = ({obj, pizzaTypes}) => {
+export const CartItem: React.FC<CartItemProps> = ({obj, pizzaTypes}) => {
 
     const dispatch = useDispatch()
 
@@ -22,7 +22,7 @@ let CartItem: React.FC<CartItemProps> = ({obj, pizzaTypes}) => {
             <p>{pizzaTypes[obj.type]} тесто, {obj.size} см.</p>
         </div>
         <div className="cart__item-count">
-            <div onClick={() => dispatch(reducePizzaItem(obj))} className="button button--outline button--circle cart__item-count-minus">
+            <div onClick={() => dispatch(reducePizzaItem(obj))} className={ "button button--outline button--circle cart__item-count-minus" + " " + (obj.count > 1 ? '' : "button_disable") }>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -67,5 +67,3 @@ let CartItem: React.FC<CartItemProps> = ({obj, pizzaTypes}) => {
         </div>
     </div>)
 }
-
-export default CartItem
